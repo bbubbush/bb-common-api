@@ -46,6 +46,5 @@ dockerCompose {
 
 tasks.named('bootRun') {
     systemProperty 'spring.profiles.active', findProperty('spring.profiles.active') ?: 'local'
-    dockerComposeDown.run()
     dockerComposeUp.run()
 }
