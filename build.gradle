@@ -2,6 +2,7 @@ plugins {
     id 'org.springframework.boot' version '2.6.7'
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id 'java'
+    id 'com.palantir.docker-compose' version '0.33.0'
 }
 
 group = 'com.bb'
@@ -24,7 +25,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-mail'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation('com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.4')
+    implementation 'com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.4'
+    implementation 'org.springframework.kafka:spring-kafka'
 
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'mysql:mysql-connector-java'
@@ -36,4 +38,14 @@ dependencies {
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+dockerCompose {
+    dockerComposeFile 'docker-compose.yaml'
+}
+
+tasks.named('bootRun') {
+    systemProperty 'spring.profiles.active', findProperty('spring.profiles.active') ?: 'local'
+    dockerComposeDown.run()
+    dockerComposeUp.run()
 }
