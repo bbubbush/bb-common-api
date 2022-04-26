@@ -38,4 +38,5 @@ out/
 .vscode/
 
 ### YAML ###
-*.yaml
+src/main/resources/*.yaml
+src/test/resources/*.yaml
