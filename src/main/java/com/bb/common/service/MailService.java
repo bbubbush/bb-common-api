@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -26,9 +27,12 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class MailService {
   private final JavaMailSender mailSender;
+
+  private final String KAFKA_MAIL_TOPIC = "mail";
   @Value("${templates.mail.path}")
   private String mailTemplatePath;
 
+  @KafkaListener(topics = KAFKA_MAIL_TOPIC, groupId = "bb-common-mail")
   public void send(MailReqVO mailReqVO) {
     MailSendVO mailSendVO =
         createMailSendBuilder(mailReqVO).text(getDefaultMailTemplate(mailReqVO.getText())).build();
@@ -66,7 +70,7 @@ public class MailService {
     if (StringUtils.isEmpty(errorMsg)) {
       errorMsg = ResponseCode.SERVER_ERROR.getMessage();
     }
-    return readFile(MailTemplateType.DEFAULT.getTemplateFileName())
+    return readTemplate(MailTemplateType.DEFAULT.getTemplateFileName())
         .replace("${sendMsg}", errorMsg);
   }
 
@@ -74,10 +78,11 @@ public class MailService {
     if (StringUtils.isEmpty(errorMsg)) {
       errorMsg = ResponseCode.SERVER_ERROR.getMessage();
     }
-    return readFile(MailTemplateType.ERROR.getTemplateFileName()).replace("${errorMsg}", errorMsg);
+    return readTemplate(MailTemplateType.ERROR.getTemplateFileName())
+        .replace("${errorMsg}", errorMsg);
   }
 
-  private String readFile(String fileName) {
+  private String readTemplate(String fileName) {
     String contents = null;
     ClassPathResource resource =
         new ClassPathResource(mailTemplatePath + File.separator + fileName);
