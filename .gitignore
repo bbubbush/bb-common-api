@@ -43,3 +43,6 @@ src/test/resources/*.yaml
 
 ### Jasypt ###
 src/main/resources/jasypt-encryptor-password.txt
+
+### SSL ###
+cert_and_key.p12
