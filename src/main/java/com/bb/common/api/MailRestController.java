@@ -1,6 +1,6 @@
 package com.bb.common.api;
 
-import com.bb.common.service.KafkaService;
+import com.bb.common.service.KafkaMailService;
 import com.bb.common.util.ApiResponse;
 import com.bb.common.vo.common.ResponseVO;
 import com.bb.common.vo.req.MailReqVO;
@@ -16,11 +16,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/mail")
 @RequiredArgsConstructor
 public class MailRestController {
-  private final KafkaService kafkaService;
+  private final KafkaMailService kafkaMailService;
 
   @PostMapping("/send")
   public ResponseVO<String> sendMail(@RequestBody MailReqVO mailReqVO) {
-    kafkaService.sendMail(mailReqVO);
+    kafkaMailService.send(mailReqVO);
     return ApiResponse.success("");
   }
 }
